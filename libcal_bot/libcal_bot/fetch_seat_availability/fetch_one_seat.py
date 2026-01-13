@@ -4,6 +4,8 @@ import sqlite3
 from datetime import datetime, timezone
 import requests
 from db import init_db
+from discover_allseat_id import fetch_seat_name
+
 
 GRID_URL = "https://libcal.rug.nl/spaces/availability/grid"
 
@@ -49,12 +51,23 @@ def fetch_slots(seat_id: int, start_date: str, end_date: str,
     payload = r.json()
     return payload.get("slots", [])
 
-def upsert_seat(conn: sqlite3.Connection, seat_id: int, seat_url: str):
+def upsert_seat(
+    conn: sqlite3.Connection,
+    seat_id: int,
+    seat_url: str,
+    seat_name: str | None = None,
+):
     conn.execute(
-        "INSERT INTO seats(seat_id, seat_url) VALUES(?, ?) "
-        "ON CONFLICT(seat_id) DO UPDATE SET seat_url=excluded.seat_url",
-        (seat_id, seat_url),
+        """
+        INSERT INTO seats(seat_id, seat_url, seat_name)
+        VALUES(?, ?, ?)
+        ON CONFLICT(seat_id) DO UPDATE SET
+          seat_url = excluded.seat_url,
+          seat_name = COALESCE(excluded.seat_name, seats.seat_name)
+        """,
+        (seat_id, seat_url, seat_name),
     )
+
 
 def insert_snapshot(conn: sqlite3.Connection, seat_id: int, slots: list[dict]):
     captured_at = datetime.now(timezone.utc).isoformat()
@@ -95,10 +108,15 @@ def main():
 
     conn = init_db("libcal.sqlite")
     try:
-        upsert_seat(conn, seat_id, seat_url)
+        with requests.Session() as s:
+            seat_name = fetch_seat_name(s, seat_id)
+
+        upsert_seat(conn, seat_id, seat_url, seat_name)
+
         slots = fetch_slots(seat_id, start_date, end_date)
         insert_snapshot(conn, seat_id, slots)
-        print(f"Fetched {len(slots)} slots and stored snapshot.")
+
+        print(f"Fetched {len(slots)} slots and stored snapshot. seat_name={seat_name}")
     finally:
         conn.close()
 

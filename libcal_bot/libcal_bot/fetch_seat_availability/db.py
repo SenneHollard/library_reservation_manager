@@ -5,8 +5,9 @@ SCHEMA = """
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS seats (
-  seat_id   INTEGER PRIMARY KEY,
-  seat_url  TEXT
+  seat_id    INTEGER PRIMARY KEY,
+  seat_url   TEXT,
+  seat_name  TEXT
 );
 
 CREATE TABLE IF NOT EXISTS timeslots (
@@ -24,6 +25,9 @@ CREATE TABLE IF NOT EXISTS timeslots (
 
 CREATE INDEX IF NOT EXISTS idx_timeslots_lookup
 ON timeslots(seat_id, start_iso, end_iso);
+
+CREATE INDEX IF NOT EXISTS idx_seats_name
+ON seats(seat_name);
 """
 
 def init_db(path="libcal.sqlite"):

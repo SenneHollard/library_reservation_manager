@@ -2,25 +2,18 @@
 from __future__ import annotations
 
 import time
-import sqlite3
-from datetime import datetime, timezone
-
 import requests
 
 from db import init_db
-from discover_allseat_id import fetch_all_seat_ids
+from discover_allseat_id import fetch_all_seat_ids, fetch_seat_name
 from fetch_one_seat import GRID_URL, status_from_classname, upsert_seat
+from datetime import datetime, timezone
+import sqlite3
 
 
-def fetch_slots_with_retry(
-    session: requests.Session,
-    seat_id: int,
-    start_date: str,
-    end_date: str,
-    lid=1443, gid=3634, eid=10948, zone=0,
-    page_index=0, page_size=200,
-    max_retries: int = 5,
-) -> list[dict]:
+
+def fetch_slots_with_retry(session: requests.Session, seat_id: int, start_date: str, end_date: str,
+                           lid=1443, gid=3634, eid=10948, zone=0, max_retries: int = 5) -> list[dict]:
     data = {
         "lid": str(lid),
         "gid": str(gid),
@@ -30,39 +23,31 @@ def fetch_slots_with_retry(
         "zone": str(zone),
         "start": start_date,
         "end": end_date,
-        "pageIndex": str(page_index),
-        "pageSize": str(page_size),
+        "pageIndex": "0",
+        "pageSize": "200",
     }
 
     for attempt in range(max_retries):
         r = session.post(GRID_URL, data=data, timeout=30)
-
-        # Rate-limit / tijdelijke server errors -> exponential backoff
         if r.status_code in (429, 500, 502, 503, 504):
-            wait = min(60, 1.5 ** attempt)
-            time.sleep(wait)
+            time.sleep(min(60, 1.5 ** attempt))
             continue
-
         r.raise_for_status()
         return r.json().get("slots", [])
-
-    # laatste poging: raise voor debugging
     r.raise_for_status()
     return []
 
 
 def upsert_timeslots(conn: sqlite3.Connection, seat_id: int, slots: list[dict]):
     captured_at = datetime.now(timezone.utc).isoformat()
-
     for it in slots:
         start = it.get("start")
         end = it.get("end")
+        if not start or not end:
+            continue
         class_name = it.get("className", "")
         checksum = it.get("checksum")
         status = status_from_classname(class_name)
-
-        if not start or not end:
-            continue
 
         conn.execute(
             """
@@ -79,15 +64,18 @@ def upsert_timeslots(conn: sqlite3.Connection, seat_id: int, slots: list[dict]):
         )
 
 
-def main():
-    # pas aan naar de dag die je wil
-    start_date = "2026-01-13"
-    end_date   = "2026-01-14"
-
+def run_bulk_fetch(start_date: str, end_date: str, db_path: str = "libcal.sqlite",
+                   batch_size: int = 25, polite_sleep: float = 0.15,
+                   progress_cb=None) -> tuple[int, int]:
+    """
+    Returns (processed_count, failed_count)
+    progress_cb: function(i, total, seat_id, failed_count) -> None
+    """
     seat_ids = fetch_all_seat_ids()
-    print(f"Found {len(seat_ids)} seats.")
+    total = len(seat_ids)
+    failed = 0
 
-    conn = init_db("libcal.sqlite")
+    conn = init_db(db_path)
 
     s = requests.Session()
     s.headers.update({
@@ -98,32 +86,47 @@ def main():
         "Referer": "https://libcal.rug.nl/seats",
     })
 
-    batch_size = 25          # commit elke 25 seats
-    polite_sleep = 0.15      # throttle (0.1–0.5 is typisch ok)
-
     try:
         conn.execute("BEGIN")
         for i, seat_id in enumerate(seat_ids, 1):
             seat_url = f"https://libcal.rug.nl/seat/{seat_id}"
-            upsert_seat(conn, seat_id, seat_url)
+            seat_name = None
+            try:
+                seat_name = fetch_seat_name(s, seat_id)   # let op: s is requests.Session
+            except Exception:
+                seat_name = None
+
+            upsert_seat(conn, seat_id, seat_url, seat_name)
 
             try:
                 slots = fetch_slots_with_retry(s, seat_id, start_date, end_date)
                 upsert_timeslots(conn, seat_id, slots)
             except Exception as e:
-                print(f"[{i}/{len(seat_ids)}] seat {seat_id} FAILED: {e}")
+                failed += 1
+                print(f"[{i}/{total}] seat {seat_id} FAILED: {e}")
 
             if i % batch_size == 0:
                 conn.commit()
                 conn.execute("BEGIN")
-                print(f"Processed {i}/{len(seat_ids)} seats...")
+
+            if progress_cb is not None:
+                progress_cb(i, total, seat_id, failed)
 
             time.sleep(polite_sleep)
 
         conn.commit()
-        print("Done.")
+        if progress_cb is not None:
+            progress_cb(total, total, seat_ids[-1] if total else None, failed)
+
+        return total, failed
     finally:
         conn.close()
+
+
+def main():
+    # voorbeeld
+    processed = run_bulk_fetch("2026-01-13", "2026-01-14", db_path="libcal.sqlite")
+    print(f"Done. Processed {processed} seats.")
 
 
 if __name__ == "__main__":
