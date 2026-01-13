@@ -1,15 +1,13 @@
 # fetch_all_seats.py
 from __future__ import annotations
-
 import time
 import requests
-
-from db import init_db
-from discover_allseat_id import fetch_all_seat_ids, fetch_seat_name
-from fetch_one_seat import GRID_URL, status_from_classname, upsert_seat
-from datetime import datetime, timezone
 import sqlite3
+from datetime import datetime, timezone
 
+from fetch_availability.db import init_db
+from fetch_availability.discover_seats import fetch_all_seat_ids
+from fetch_availability.fetch_one_seat import GRID_URL, status_from_classname, upsert_seat
 
 
 def fetch_slots_with_retry(session: requests.Session, seat_id: int, start_date: str, end_date: str,
@@ -64,7 +62,7 @@ def upsert_timeslots(conn: sqlite3.Connection, seat_id: int, slots: list[dict]):
         )
 
 
-def run_bulk_fetch(start_date: str, end_date: str, db_path: str = "libcal.sqlite",
+def run_bulk_fetch(start_date: str, end_date: str, db_path: str | None = None,
                    batch_size: int = 25, polite_sleep: float = 0.15,
                    progress_cb=None) -> tuple[int, int]:
     """
@@ -124,9 +122,8 @@ def run_bulk_fetch(start_date: str, end_date: str, db_path: str = "libcal.sqlite
 
 
 def main():
-    # voorbeeld
-    processed = run_bulk_fetch("2026-01-13", "2026-01-14", db_path="libcal.sqlite")
-    print(f"Done. Processed {processed} seats.")
+    processed, failed = run_bulk_fetch("2026-01-13", "2026-01-14")
+    print(f"Done. Processed {processed} seats, failed {failed}.")
 
 
 if __name__ == "__main__":

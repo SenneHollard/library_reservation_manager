@@ -1,4 +1,4 @@
-# discover_allseat_id.py
+# discover_seats.py
 from __future__ import annotations
 import re
 import time

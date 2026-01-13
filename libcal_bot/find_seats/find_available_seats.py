@@ -1,6 +1,7 @@
 # find_available_seats.py
 import sqlite3
 from typing import List, Tuple
+from paths import DB_PATH
 
 
 SQL_FULLY_AVAILABLE = """
@@ -32,7 +33,7 @@ ORDER BY s.seat_id;
 """
 
 def seats_fully_available(db_path: str, x: str, y: str) -> List[Tuple[int, str]]:
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(str(DB_PATH))
     try:
         rows = conn.execute(SQL_FULLY_AVAILABLE, {"x": x, "y": y}).fetchall()
         return [(int(seat_id), str(seat_url)) for seat_id, seat_url in rows]

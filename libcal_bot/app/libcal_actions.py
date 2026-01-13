@@ -3,8 +3,9 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 from typing import List, Tuple, Optional
-
-DB_PATH = Path(__file__).resolve().parent / "libcal.sqlite"
+from paths import DB_PATH
+from fetch_availability.fetch_all_seats import run_bulk_fetch
+from book_seats.book_seat import book_seat_now as _book
 
 SQL_FULLY_AVAILABLE = """
 WITH interval_slots AS (
@@ -47,9 +48,9 @@ def get_available_seats(x: str, y: str) -> List[Tuple[Optional[str], str, int]]:
         conn.close()
 
 def update_availability_for_date(start_date: str, end_date: str, progress_cb=None):
-    from fetch_all_seats import run_bulk_fetch
+    from fetch_availability.fetch_all_seats import run_bulk_fetch
     return run_bulk_fetch(start_date, end_date, db_path=str(DB_PATH), progress_cb=progress_cb)
 
 def book_seat_now(seat_id: int, start_label_regex: str, end_value: str, profile: dict) -> str:
-    from book_seat import book_seat_now as _book
+    from fetch_availability.book_seat import book_seat_now as _book
     return _book(seat_id, start_label_regex, end_value, profile)
