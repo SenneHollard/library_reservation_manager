@@ -3,8 +3,8 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime, timezone
 import requests
-from db import init_db
-from discover_allseat_id import fetch_seat_name
+from fetch_availability.db import init_db
+from fetch_availability.discover_seats import fetch_seat_name
 
 
 GRID_URL = "https://libcal.rug.nl/spaces/availability/grid"

@@ -1,5 +1,6 @@
 # db.py
 import sqlite3
+from paths import DB_PATH
 
 SCHEMA = """
 PRAGMA foreign_keys = ON;
@@ -30,8 +31,9 @@ CREATE INDEX IF NOT EXISTS idx_seats_name
 ON seats(seat_name);
 """
 
-def init_db(path="libcal.sqlite"):
-    conn = sqlite3.connect(path)
+def init_db(path: str | None = None):
+    db_path = str(DB_PATH) if path is None else path
+    conn = sqlite3.connect(db_path)
     conn.executescript(SCHEMA)
     conn.commit()
     return conn
