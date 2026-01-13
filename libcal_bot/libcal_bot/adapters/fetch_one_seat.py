@@ -59,32 +59,27 @@ def upsert_seat(conn: sqlite3.Connection, seat_id: int, seat_url: str):
 def insert_snapshot(conn: sqlite3.Connection, seat_id: int, slots: list[dict]):
     captured_at = datetime.now(timezone.utc).isoformat()
 
-    # bepaal range uit input (start/end van slots)
-    starts = [it.get("start") for it in slots if it.get("start")]
-    ends = [it.get("end") for it in slots if it.get("end")]
-    if not starts or not ends:
-        return
-
-    min_start = min(starts)
-    max_end = max(ends)
-
-    conn.execute(
-        "DELETE FROM timeslots WHERE seat_id=? AND start_iso>=? AND end_iso<=?",
-        (seat_id, min_start, max_end),
-    )
-
     for it in slots:
         start = it.get("start")
         end = it.get("end")
         class_name = it.get("className", "")
         checksum = it.get("checksum")
         status = status_from_classname(class_name)
+
         if not start or not end:
             continue
 
         conn.execute(
-            "INSERT INTO timeslots(seat_id, start_iso, end_iso, status, class_name, checksum, captured_at_iso) "
-            "VALUES(?, ?, ?, ?, ?, ?, ?)",
+            """
+            INSERT INTO timeslots(seat_id, start_iso, end_iso, status, class_name, checksum, captured_at_iso)
+            VALUES(?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(seat_id, start_iso, end_iso)
+            DO UPDATE SET
+              status=excluded.status,
+              class_name=excluded.class_name,
+              checksum=excluded.checksum,
+              captured_at_iso=excluded.captured_at_iso
+            """,
             (seat_id, start, end, status, class_name, checksum, captured_at),
         )
 
