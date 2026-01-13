@@ -1,9 +1,0 @@
-# SQLite databases
-*.sqlite
-*.sqlite3
-libcal.sqlite
-
-book_seat.py
-booking_result.png
-
-user_profile.json
