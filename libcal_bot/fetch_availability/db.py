@@ -1,6 +1,6 @@
 # db.py
 import sqlite3
-from paths import DB_PATH
+from libcal_bot.paths import DB_PATH
 
 SCHEMA = """
 PRAGMA foreign_keys = ON;

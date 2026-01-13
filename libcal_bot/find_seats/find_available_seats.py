@@ -1,7 +1,7 @@
 # find_available_seats.py
 import sqlite3
 from typing import List, Tuple
-from paths import DB_PATH
+from libcal_bot.paths import DB_PATH
 
 
 SQL_FULLY_AVAILABLE = """

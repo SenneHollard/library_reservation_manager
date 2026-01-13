@@ -5,9 +5,9 @@ from datetime import date, timedelta, time
 import time
 import json
 from pathlib import Path
-from paths import DB_PATH, PROFILE_PATH
+from libcal_bot.paths import DB_PATH, PROFILE_PATH
 
-from libcal_actions import get_available_seats, update_availability_for_date, book_seat_now
+from libcal_bot.app.libcal_actions import get_available_seats, update_availability_for_date, book_seat_now
 
 PROFILE_PATH = Path(__file__).resolve().parent / "user_profile.json"
 

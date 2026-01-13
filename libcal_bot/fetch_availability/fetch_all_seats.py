@@ -5,9 +5,9 @@ import requests
 import sqlite3
 from datetime import datetime, timezone
 
-from fetch_availability.db import init_db
-from fetch_availability.discover_seats import fetch_all_seat_ids
-from fetch_availability.fetch_one_seat import GRID_URL, status_from_classname, upsert_seat
+from libcal_bot.fetch_availability.db import init_db
+from libcal_bot.fetch_availability.discover_seats import fetch_all_seat_ids
+from libcal_bot.fetch_availability.fetch_one_seat import GRID_URL, status_from_classname, upsert_seat
 
 
 def fetch_slots_with_retry(session: requests.Session, seat_id: int, start_date: str, end_date: str,
