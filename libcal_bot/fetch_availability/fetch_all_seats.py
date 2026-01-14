@@ -253,4 +253,55 @@ def fetch_availability(
         return total, failed
     finally:
         conn.close()
-        s.cl
+        s.close()
+
+def clean_up(
+    db_path: str | None = None,
+    *,
+    day: str | date | None = None,
+    delete_before: str | date | None = None,
+) -> int:
+    """
+    Verwijdert rows uit `timeslots`.
+
+    Opties:
+      - day="YYYY-MM-DD": verwijder alle timeslots waarvan start_iso op die dag valt
+      - delete_before="YYYY-MM-DD": verwijder alle timeslots met start_iso datum < cutoff
+        (handig voor: alles van gisteren en ouder verwijderen door delete_before=vandaag)
+
+    Als zowel `day` als `delete_before` None zijn:
+      -> delete_before = vandaag (UTC), dus alles vóór vandaag wordt verwijderd.
+
+    Returns:
+      - aantal verwijderde rows (int)
+    """
+    def _to_datestr(x: str | date) -> str:
+        return x if isinstance(x, str) else x.isoformat()
+
+    if day is not None and delete_before is not None:
+        raise ValueError("Gebruik óf `day` óf `delete_before`, niet allebei.")
+
+    if day is None and delete_before is None:
+        # default: verwijder alles van vóór vandaag (UTC)
+        delete_before = datetime.now(timezone.utc).date()
+
+    conn = init_db(db_path)
+    try:
+        if day is not None:
+            d = _to_datestr(day)
+            # start_iso is ISO string -> eerste 10 chars zijn YYYY-MM-DD
+            cur = conn.execute(
+                "DELETE FROM timeslots WHERE substr(start_iso, 1, 10) = ?",
+                (d,),
+            )
+        else:
+            cutoff = _to_datestr(delete_before)  # type: ignore[arg-type]
+            cur = conn.execute(
+                "DELETE FROM timeslots WHERE substr(start_iso, 1, 10) < ?",
+                (cutoff,),
+            )
+
+        conn.commit()
+        return int(cur.rowcount or 0)
+    finally:
+        conn.close()

@@ -460,4 +460,107 @@ with automate_col:
     if not checkins:
         st.info("No scheduled check-ins yet.")
     else:
-        
+        st.markdown("#### Cancel a pending check-in")
+        pending = [c for c in checkins if c["status"] == "pending"]
+        if not pending:
+            st.caption("No pending check-ins to cancel.")
+        else:
+            # show buttons per pending checkin
+            for c in pending:
+                c1, c2, c3 = st.columns([2, 2, 1])
+                with c1:
+                    st.write(f"ID **{c['id']}**")
+                with c2:
+                    st.write(f"Runs at **{c['run_at_iso']}**")
+                with c3:
+                    if st.button("Cancel", key=f"cancel_checkin_{c['id']}"):
+                        ok = cancel_checkin(checkin_id=c["id"])
+                        if ok:
+                            st.success(f"Cancelled check-in {c['id']}.")
+                        else:
+                            st.warning("Could not cancel (maybe it already started).")
+                        st.rerun()
+
+    # -----------------------
+    # Hunting status + stop
+    # -----------------------
+    st.divider()
+    st.markdown("#### Hunting status")
+
+    hs = get_hunting_status()
+    if hs.get("active"):
+        st.success("🟢 Hunting is ACTIVE")
+        st.write(f"Started: {hs.get('created_at_iso')}")
+        st.write(f"Last run: {hs.get('last_run_at_iso')}")
+        if hs.get("error"):
+            st.error(f"Last error: {hs['error']}")
+        if hs.get("booked"):
+            st.success(f"Booked: {hs['booked']}")
+        if st.button("Stop hunting", type="primary", key="btn_stop_hunting"):
+            stop_hunting(reason="Stopped from UI")
+            st.success("Hunting stopped.")
+            st.rerun()
+    else:
+        st.info("🔴 Hunting is NOT active")
+        if hs.get("stopped_at_iso"):
+            st.caption(f"Stopped at: {hs.get('stopped_at_iso')}")
+        if hs.get("error"):
+            st.caption(f"Last error: {hs.get('error')}")
+        if hs.get("booked"):
+            st.caption(f"Last booked: {hs.get('booked')}")
+
+
+# ----------------------------
+# Bottom: Data (advanced / debug)
+# ----------------------------
+
+st.divider()
+st.markdown("### Data")
+
+if worker_is_running():
+    st.success(
+        "Background worker is running — availability is updated automatically. "
+        "Manual refresh is usually unnecessary."
+    )
+else:
+    st.warning(
+        "⚠️ Background worker not detected. "
+        "Automatic updates may not be running."
+    )
+
+st.caption(
+    "Availability is normally updated automatically in the background. "
+    "Use this only if you want to force a manual refresh."
+)
+
+with st.expander("Advanced: force refresh availability", expanded=False):
+    if st.button(
+        "Force refresh availability (advanced)",
+        type="secondary",
+        key="force_refresh_availability",
+    ):
+        progress = st.progress(0)
+        status = st.empty()
+        started = time.time()
+
+        def cb(i, total, seat_id, failed):
+            pct = int((i / total) * 100) if total else 0
+            progress.progress(pct)
+            status.write(
+                f"Refreshing availability {i}/{total} "
+                f"(failed: {failed}) — last seat: {seat_id}"
+            )
+
+        with st.spinner("Forcing availability refresh…"):
+            total, failed = update_availability_for_date(
+                d.isoformat(),
+                (d + timedelta(days=1)).isoformat(),
+                progress_cb=cb,
+            )
+
+        elapsed = time.time() - started
+        st.success(
+            f"Refresh complete. "
+            f"Processed {total} seats, failed {failed}. "
+            f"Took {elapsed:.1f}s."
+        )
