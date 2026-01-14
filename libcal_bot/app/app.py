@@ -376,8 +376,6 @@ with automate_col:
                 )
 
                 st.success(f"✅ Check-in scheduled (id={task_id}) for {checkin_date} at {checkin_start} (+5 min).")
-
-            st.session_state.show_checkin_form = False
     
         st.divider()
 

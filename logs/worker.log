@@ -105,3 +105,92 @@ sqlite3.OperationalError: database is locked
 2026-01-14 18:26:00,005 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:27:00 CET)" executed successfully
 2026-01-14 18:27:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:28:00 CET)" (scheduled at 2026-01-14 18:27:00+01:00)
 2026-01-14 18:27:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:28:00 CET)" executed successfully
+2026-01-14 18:28:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:29:00 CET)" (scheduled at 2026-01-14 18:28:00+01:00)
+2026-01-14 18:28:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:29:00 CET)" executed successfully
+2026-01-14 18:29:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:30:00 CET)" (scheduled at 2026-01-14 18:29:00+01:00)
+2026-01-14 18:29:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:30:00 CET)" executed successfully
+2026-01-14 18:30:00,003 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:31:00 CET)" (scheduled at 2026-01-14 18:30:00+01:00)
+2026-01-14 18:30:00,005 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:31:00 CET)" executed successfully
+2026-01-14 18:30:00,006 INFO Running job "hunting_tick_job (trigger: cron[hour='9-20', minute='0,30'], next run at: 2026-01-14 19:00:00 CET)" (scheduled at 2026-01-14 18:30:00+01:00)
+2026-01-14 18:30:00,007 INFO Job "hunting_tick_job (trigger: cron[hour='9-20', minute='0,30'], next run at: 2026-01-14 19:00:00 CET)" executed successfully
+2026-01-14 18:31:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:32:00 CET)" (scheduled at 2026-01-14 18:31:00+01:00)
+2026-01-14 18:31:00,005 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:32:00 CET)" executed successfully
+2026-01-14 18:32:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:33:00 CET)" (scheduled at 2026-01-14 18:32:00+01:00)
+2026-01-14 18:32:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:33:00 CET)" executed successfully
+2026-01-14 18:33:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:34:00 CET)" (scheduled at 2026-01-14 18:33:00+01:00)
+2026-01-14 18:33:00,023 INFO Ran 1 scheduled checkin(s)
+2026-01-14 18:33:00,023 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:34:00 CET)" executed successfully
+2026-01-14 18:34:00,007 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:35:00 CET)" (scheduled at 2026-01-14 18:34:00+01:00)
+2026-01-14 18:34:00,010 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:35:00 CET)" executed successfully
+2026-01-14 18:35:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:36:00 CET)" (scheduled at 2026-01-14 18:35:00+01:00)
+2026-01-14 18:35:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:36:00 CET)" executed successfully
+2026-01-14 18:36:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:37:00 CET)" (scheduled at 2026-01-14 18:36:00+01:00)
+2026-01-14 18:36:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:37:00 CET)" executed successfully
+2026-01-14 18:37:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:38:00 CET)" (scheduled at 2026-01-14 18:37:00+01:00)
+2026-01-14 18:37:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:38:00 CET)" executed successfully
+2026-01-14 18:38:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:39:00 CET)" (scheduled at 2026-01-14 18:38:00+01:00)
+2026-01-14 18:38:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:39:00 CET)" executed successfully
+2026-01-14 18:39:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:40:00 CET)" (scheduled at 2026-01-14 18:39:00+01:00)
+2026-01-14 18:39:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:40:00 CET)" executed successfully
+2026-01-14 18:40:00,007 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:41:00 CET)" (scheduled at 2026-01-14 18:40:00+01:00)
+2026-01-14 18:40:00,010 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:41:00 CET)" executed successfully
+2026-01-14 18:41:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:42:00 CET)" (scheduled at 2026-01-14 18:41:00+01:00)
+2026-01-14 18:41:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:42:00 CET)" executed successfully
+2026-01-14 18:42:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:43:00 CET)" (scheduled at 2026-01-14 18:42:00+01:00)
+2026-01-14 18:42:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:43:00 CET)" executed successfully
+2026-01-14 18:43:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:44:00 CET)" (scheduled at 2026-01-14 18:43:00+01:00)
+2026-01-14 18:43:00,010 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:44:00 CET)" executed successfully
+2026-01-14 18:44:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:45:00 CET)" (scheduled at 2026-01-14 18:44:00+01:00)
+2026-01-14 18:44:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:45:00 CET)" executed successfully
+2026-01-14 18:45:00,006 INFO Running job "update_today_job (trigger: cron[hour='8-20', minute='15,45'], next run at: 2026-01-14 19:15:00 CET)" (scheduled at 2026-01-14 18:45:00+01:00)
+2026-01-14 18:45:00,006 INFO Updating today availability: start=2026-01-14 end=2026-01-15
+2026-01-14 18:45:00,011 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:46:00 CET)" (scheduled at 2026-01-14 18:45:00+01:00)
+2026-01-14 18:45:00,023 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:46:00 CET)" executed successfully
+2026-01-14 18:46:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:47:00 CET)" (scheduled at 2026-01-14 18:46:00+01:00)
+2026-01-14 18:46:03,382 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:47:00 CET)" executed successfully
+2026-01-14 18:47:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:48:00 CET)" (scheduled at 2026-01-14 18:47:00+01:00)
+2026-01-14 18:47:06,307 ERROR Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:48:00 CET)" raised an exception
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/libcal/lib/python3.11/site-packages/apscheduler/executors/base.py", line 131, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sennehollard/Documents/AI_premaster/Object_Oriented_Programming/library_reservation_manager/libcal_bot/worker/scheduler_worker.py", line 73, in dispatch_checkins_job
+    n = dispatch_due_checkins(
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sennehollard/Documents/AI_premaster/Object_Oriented_Programming/library_reservation_manager/libcal_bot/worker/tasks.py", line 105, in dispatch_due_checkins
+    _ensure_schema(conn)
+  File "/Users/sennehollard/Documents/AI_premaster/Object_Oriented_Programming/library_reservation_manager/libcal_bot/worker/tasks.py", line 44, in _ensure_schema
+    conn.executescript(SCHEMA)
+sqlite3.OperationalError: database is locked
+2026-01-14 18:48:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:49:00 CET)" (scheduled at 2026-01-14 18:48:00+01:00)
+2026-01-14 18:48:03,684 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:49:00 CET)" executed successfully
+2026-01-14 18:49:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:50:00 CET)" (scheduled at 2026-01-14 18:49:00+01:00)
+2026-01-14 18:49:01,703 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:50:00 CET)" executed successfully
+2026-01-14 18:50:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:51:00 CET)" (scheduled at 2026-01-14 18:50:00+01:00)
+2026-01-14 18:50:00,475 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:51:00 CET)" executed successfully
+2026-01-14 18:50:13,474 ERROR Task exception was never retrieved
+future: <Task finished name='Task-43' coro=<Connection.run.<locals>.init() done, defined at /opt/anaconda3/envs/libcal/lib/python3.11/site-packages/playwright/_impl/_connection.py:309> exception=Exception('Connection.init: Connection closed while reading from the driver')>
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/libcal/lib/python3.11/site-packages/playwright/_impl/_connection.py", line 310, in init
+    self.playwright_future.set_result(await self._root_object.initialize())
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/libcal/lib/python3.11/site-packages/playwright/_impl/_connection.py", line 251, in initialize
+    await self._channel.send(
+  File "/opt/anaconda3/envs/libcal/lib/python3.11/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/libcal/lib/python3.11/site-packages/playwright/_impl/_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+Exception: Connection.init: Connection closed while reading from the driver
+2026-01-14 18:51:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:52:00 CET)" (scheduled at 2026-01-14 18:51:00+01:00)
+2026-01-14 18:51:02,732 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:52:00 CET)" executed successfully
+2026-01-14 18:51:17,503 INFO Update today done: processed=1610 failed=0
+2026-01-14 18:51:17,504 INFO Job "update_today_job (trigger: cron[hour='8-20', minute='15,45'], next run at: 2026-01-14 19:15:00 CET)" executed successfully
+2026-01-14 18:52:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:53:00 CET)" (scheduled at 2026-01-14 18:52:00+01:00)
+2026-01-14 18:52:00,005 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:53:00 CET)" executed successfully
+2026-01-14 18:53:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:54:00 CET)" (scheduled at 2026-01-14 18:53:00+01:00)
+2026-01-14 18:53:00,009 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:54:00 CET)" executed successfully
+2026-01-14 18:54:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:55:00 CET)" (scheduled at 2026-01-14 18:54:00+01:00)
+2026-01-14 18:54:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:55:00 CET)" executed successfully
+2026-01-14 18:55:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:56:00 CET)" (scheduled at 2026-01-14 18:55:00+01:00)
+2026-01-14 18:55:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:56:00 CET)" executed successfully
