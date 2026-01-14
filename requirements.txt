@@ -2,3 +2,6 @@ streamlit
 pandas
 numpy<2
 playwright
+
+apscheduler
+sqlalchemy
