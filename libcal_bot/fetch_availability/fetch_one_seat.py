@@ -51,21 +51,22 @@ def fetch_slots(seat_id: int, start_date: str, end_date: str,
     payload = r.json()
     return payload.get("slots", [])
 
-def upsert_seat(
-    conn: sqlite3.Connection,
-    seat_id: int,
-    seat_url: str,
-    seat_name: str | None = None,
-):
+def upsert_seat(conn, seat_id, seat_url, seat_name=None, power_available=None):
     conn.execute(
         """
-        INSERT INTO seats(seat_id, seat_url, seat_name)
-        VALUES(?, ?, ?)
+        INSERT INTO seats(seat_id, seat_url, seat_name, power_available)
+        VALUES(?, ?, ?, ?)
         ON CONFLICT(seat_id) DO UPDATE SET
           seat_url = excluded.seat_url,
-          seat_name = COALESCE(excluded.seat_name, seats.seat_name)
+          seat_name = COALESCE(excluded.seat_name, seats.seat_name),
+          power_available = COALESCE(excluded.power_available, seats.power_available)
         """,
-        (seat_id, seat_url, seat_name),
+        (
+            seat_id,
+            seat_url,
+            seat_name,
+            None if power_available is None else int(bool(power_available)),
+        ),
     )
 
 

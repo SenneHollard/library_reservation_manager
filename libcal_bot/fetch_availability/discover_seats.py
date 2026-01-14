@@ -87,12 +87,16 @@ def extract_seat_name_from_seat_page(html: str) -> Optional[str]:
 
     return None
 
+def fetch_seat_name_from_html(html: str) -> Optional[str]:
+    # single source of truth for seat-name parsing
+    return extract_seat_name_from_seat_page(html)
+
 
 def fetch_seat_name(session: requests.Session, seat_id: int) -> Optional[str]:
     url = f"https://libcal.rug.nl/seat/{seat_id}"
     r = session.get(url, timeout=30)
     r.raise_for_status()
-    return extract_seat_name_from_seat_page(r.text)
+    return fetch_seat_name_from_html(r.text)
 
 
 def fetch_all_seats_with_names(
@@ -134,12 +138,9 @@ def fetch_all_seats_with_names(
 
     return out
 
-
-if __name__ == "__main__":
-    seats = fetch_all_seats_with_names(limit=20)  # test small first
-    ok = sum(1 for _, _, name in seats if name)
-    print(f"Found {len(seats)} seats, names found for {ok}.")
-    for seat_id, url, name in seats[:20]:
-        print(seat_id, name, url)
-    if ok == 0:
-        print("\nNo names found. Open debug_one_seat.html to see where the name is in the page source.")
+def find_if_power_available(html: str) -> bool:
+    """
+    Returns True iff the seat page contains the text 'Power Available'
+    (case-insensitive). Otherwise False.
+    """
+    return "power available" in html.lower()

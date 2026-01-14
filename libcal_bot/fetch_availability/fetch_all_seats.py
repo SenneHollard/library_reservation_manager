@@ -6,7 +6,7 @@ import sqlite3
 from datetime import datetime, timezone
 
 from libcal_bot.fetch_availability.db import init_db
-from libcal_bot.fetch_availability.discover_seats import fetch_all_seat_ids
+from libcal_bot.fetch_availability.discover_seats import fetch_all_seat_ids, fetch_seat_name, find_if_power_available
 from libcal_bot.fetch_availability.fetch_one_seat import GRID_URL, status_from_classname, upsert_seat
 
 
@@ -62,18 +62,130 @@ def upsert_timeslots(conn: sqlite3.Connection, seat_id: int, slots: list[dict]):
         )
 
 
-def run_bulk_fetch(start_date: str, end_date: str, db_path: str | None = None,
-                   batch_size: int = 25, polite_sleep: float = 0.15,
-                   progress_cb=None) -> tuple[int, int]:
+def init_static_data(
+    db_path: str | None = None,
+    batch_size: int = 50,
+    polite_sleep: float = 0.05,
+    progress_cb=None,
+    limit: int | None = 25,     # zet None voor alle seats
+    debug: bool = False,
+) -> tuple[int, int]:
     """
+    Builds/updates static seat data in `seats` table:
+      - seat_id
+      - seat_url
+      - seat_name (via fetch_seat_name)
+      - power_available (via HTML contains 'Power Available')
+
     Returns (processed_count, failed_count)
-    progress_cb: function(i, total, seat_id, failed_count) -> None
+    progress_cb(i, total, seat_id, failed_count)
     """
     seat_ids = fetch_all_seat_ids()
+    if limit is not None:
+        seat_ids = seat_ids[:limit]
+
     total = len(seat_ids)
     failed = 0
 
+    conn = init_db(str(db_path) if db_path is not None else None)
+
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (compatible; seat-static-init/1.0)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Referer": "https://libcal.rug.nl/seats",
+    })
+
+    try:
+        conn.execute("BEGIN")
+
+        for i, seat_id in enumerate(seat_ids, 1):
+            seat_url = f"https://libcal.rug.nl/seat/{seat_id}"
+
+            seat_name = None
+            power_available = None
+
+            try:
+                # 1) Seat name (your preferred single source of truth)
+                seat_name = fetch_seat_name(session, seat_id)
+
+                # 2) Power available: fetch HTML once and check for the phrase
+                r = session.get(seat_url, timeout=30)
+                r.raise_for_status()
+                html = r.text
+                power_available = find_if_power_available(html)
+
+                if debug and i <= 3:
+                    print("PARSED:", seat_id, repr(seat_name), power_available)
+                    row = conn.execute(
+                        "SELECT seat_name, power_available FROM seats WHERE seat_id=?",
+                        (seat_id,)
+                    ).fetchone()
+                    print("READBACK (before upsert):", seat_id, row)
+
+            except Exception as e:
+                failed += 1
+                if debug and i <= 3:
+                    print(f"FAILED seat_id={seat_id}: {e}")
+
+            upsert_seat(
+                conn,
+                seat_id=seat_id,
+                seat_url=seat_url,
+                seat_name=seat_name,
+                power_available=power_available,
+            )
+
+            if debug and i <= 3:
+                row2 = conn.execute(
+                    "SELECT seat_name, power_available FROM seats WHERE seat_id=?",
+                    (seat_id,)
+                ).fetchone()
+                print("READBACK (after upsert):", seat_id, row2)
+
+            if i % batch_size == 0:
+                conn.commit()
+                conn.execute("BEGIN")
+
+            if progress_cb is not None:
+                progress_cb(i, total, seat_id, failed)
+
+            time.sleep(polite_sleep)
+
+        conn.commit()
+
+        if progress_cb is not None and total:
+            progress_cb(total, total, seat_ids[-1], failed)
+
+        return total, failed
+
+    finally:
+        conn.close()
+        session.close()
+
+
+def _seat_ids_from_db(conn: sqlite3.Connection) -> list[int]:
+    cur = conn.execute("SELECT seat_id FROM seats ORDER BY seat_id")
+    return [r[0] for r in cur.fetchall()]
+
+def fetch_availability(
+    start_date: str,
+    end_date: str,
+    db_path: str | None = None,
+    batch_size: int = 25,
+    polite_sleep: float = 0.15,
+    progress_cb=None,
+) -> tuple[int, int]:
+    """
+    Fetches dynamic availability (timeslots) for seat_ids stored in DB.
+    Returns (processed_count, failed_count)
+    progress_cb(i, total, seat_id, failed_count)
+    """
     conn = init_db(db_path)
+    seat_ids = _seat_ids_from_db(conn)
+
+    total = len(seat_ids)
+    failed = 0
 
     s = requests.Session()
     s.headers.update({
@@ -87,15 +199,6 @@ def run_bulk_fetch(start_date: str, end_date: str, db_path: str | None = None,
     try:
         conn.execute("BEGIN")
         for i, seat_id in enumerate(seat_ids, 1):
-            seat_url = f"https://libcal.rug.nl/seat/{seat_id}"
-            seat_name = None
-            try:
-                seat_name = fetch_seat_name(s, seat_id)   # let op: s is requests.Session
-            except Exception:
-                seat_name = None
-
-            upsert_seat(conn, seat_id, seat_url, seat_name)
-
             try:
                 slots = fetch_slots_with_retry(s, seat_id, start_date, end_date)
                 upsert_timeslots(conn, seat_id, slots)
@@ -113,18 +216,10 @@ def run_bulk_fetch(start_date: str, end_date: str, db_path: str | None = None,
             time.sleep(polite_sleep)
 
         conn.commit()
-        if progress_cb is not None:
-            progress_cb(total, total, seat_ids[-1] if total else None, failed)
+        if progress_cb is not None and total:
+            progress_cb(total, total, seat_ids[-1], failed)
 
         return total, failed
     finally:
         conn.close()
-
-
-def main():
-    processed, failed = run_bulk_fetch("2026-01-13", "2026-01-14")
-    print(f"Done. Processed {processed} seats, failed {failed}.")
-
-
-if __name__ == "__main__":
-    main()
+        s.close()

@@ -1,7 +1,7 @@
 # SQLite databases
 *.sqlite
 *.sqlite3
-libcal.sqlite
+libcal_bot/data/*.sqlite
 
 book_seat.py
 booking_result.png
