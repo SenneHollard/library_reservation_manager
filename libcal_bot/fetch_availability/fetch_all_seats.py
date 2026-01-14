@@ -67,7 +67,7 @@ def init_static_data(
     batch_size: int = 50,
     polite_sleep: float = 0.05,
     progress_cb=None,
-    limit: int | None = 25,     # zet None voor alle seats
+    limit: int | None = None,
     debug: bool = False,
 ) -> tuple[int, int]:
     """

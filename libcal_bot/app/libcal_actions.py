@@ -1,12 +1,17 @@
+# libcal_actions.py
 from __future__ import annotations
-
+from datetime import datetime, timedelta
+import streamlit as st
+import time
+import requests
 import sqlite3
 from pathlib import Path
 from typing import List, Tuple, Optional
 from libcal_bot.paths import DB_PATH
-from libcal_bot.fetch_availability.fetch_all_seats import init_static_data, fetch_availability
+from libcal_bot.fetch_availability.fetch_all_seats import init_static_data, fetch_availability, fetch_slots_with_retry
 from libcal_bot.fetch_availability.db import init_db
 from libcal_bot.book_seats.book_seat import book_seat_now as _book
+from libcal_bot.fetch_availability.fetch_one_seat import status_from_classname
 
 SQL_FULLY_AVAILABLE = """
 WITH interval_slots AS (
@@ -75,5 +80,24 @@ def update_availability_for_date(
     )
 
 def book_seat_now(seat_id: int, start_label_regex: str, end_value: str, profile: dict) -> str:
-    from libcal_bot.fetch_availability.book_seat import book_seat_now as _book
+    from libcal_bot.book_seats.book_seat import book_seat_now as _book
     return _book(seat_id, start_label_regex, end_value, profile)
+
+def _slot_is_available(slots: list[dict], start_iso: str, end_iso: str) -> bool:
+    for it in slots:
+        if it.get("start") == start_iso and it.get("end") == end_iso:
+            return status_from_classname(it.get("className", "")) == "AVAILABLE"
+    return False
+
+@st.cache_data(show_spinner=False)
+def load_all_seats_from_db():
+    conn = sqlite3.connect(str(DB_PATH))
+    try:
+        rows = conn.execute(
+            "SELECT seat_name, seat_id, seat_url FROM seats WHERE seat_name IS NOT NULL ORDER BY seat_name ASC"
+        ).fetchall()
+    finally:
+        conn.close()
+
+    # mapping: seat_name -> (seat_id, seat_url)
+    return {name: (seat_id, seat_url) for (name, seat_id, seat_url) in rows}
