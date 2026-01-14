@@ -8,13 +8,33 @@ It uses:
 
 ---
 
-### A) Connect to the server
+### A) Create a RUG Linux workspace (one-time setup)
 
+Before you can connect via SSH, you must create a Linux workspace using the
+University of Groningen Virtual Linux Workplace (VLWP).
+
+1. Go to:  
+   https://vlwp.rug.nl/
+
+2. Log in with your **s-number** and RUG password
+
+3. Create a new workspace:
+   - **Operating system**: Linux
+   - **Type**: Laptop / Personal workspace
+   - Other settings: default is fine
+
+4. Wait until the workspace is fully created  
+   (this may take a few minutes)
+
+You only need to do this **once**.
+
+### B) Connect to the server
+In your own terminal
 ```bash
 ssh <s-number>@ssh.lwp.rug.nl
 ```
 
-### B) Clone the repository on the server
+### C) Clone the repository on the server
 ```bash
 mkdir -p ~/Desktop/¬/projects
 cd ~/Desktop/¬/projects
@@ -22,7 +42,7 @@ git clone https://github.com/SenneHollard/library_reservation_manager.git
 cd library_reservation_manager
 ```
 
-### C) Create and activate a server virtual environment
+### D) Create and activate a server virtual environment
 ```bash
 python3 -m venv ~/venvs/libcal-ssh
 source ~/venvs/libcal-ssh/bin/activate
@@ -31,7 +51,7 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
-### D) Start the Streamlit app in tmux
+### E) Start the Streamlit app in tmux
 ```bash
 tmux new -s app
 cd ~/Desktop/¬/projects/library_reservation_manager
@@ -41,7 +61,7 @@ VENV_PATH=$HOME/venvs/libcal-ssh bash run_app.sh
 Detach (keep running in the background):
 Press Ctrl + B, then press D
 
-### E) Access the app from your own laptop (SSH tunnel)
+### F) Access the app from your own laptop (SSH tunnel)
 On your laptop:
 ```bash
 ssh -N -L 8765:127.0.0.1:8765 <s-number>@ssh.lwp.rug.nl
@@ -49,7 +69,7 @@ ssh -N -L 8765:127.0.0.1:8765 <s-number>@ssh.lwp.rug.nl
 Open in your browser:
 http://localhost:8765
 
-### F) Start the worker in tmux (optional)
+### G) Start the worker in tmux (optional)
 ```bash
 tmux new -s workers
 cd ~/Desktop/¬/projects/library_reservation_manager
@@ -59,7 +79,7 @@ VENV_PATH=$HOME/venvs/libcal-ssh bash run_worker.sh
 Detach:
 Press Ctrl + B, then press D
 
-### G) Useful tmux commands
+### H) Useful tmux commands
 List running sessions:
 ```bash
 tmux ls
