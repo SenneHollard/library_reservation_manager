@@ -192,4 +192,278 @@ end_options = OPTIONS[start_idx + 1:]
 
 # bepaal default index
 if "end_time" in st.session_state and st.session_state.end_time in end_options:
-    end_index =
+    end_index = end_options.index(st.session_state.end_time)
+else:
+    end_index = end_options.index("22:00") if "22:00" in end_options else 0
+
+with colC:
+    end_time = st.selectbox(
+        "End",
+        end_options,
+        index=end_index,
+        key="end_time",
+    )
+
+x = f"{d.isoformat()} {start_time}:00"
+end_date = d if end_time != "00:00" else (d + timedelta(days=1))
+y = f"{end_date.isoformat()} {end_time}:00"
+
+st.caption(f"Query interval: {x} → {y}")
+st.divider()
+
+
+# ----------------------------
+# Main sections: Seats | Book | Automate
+# ----------------------------
+
+seats_col, book_col, automate_col = st.columns(3)
+
+seats = get_available_seats(x, y)
+
+# ==========
+# Seats
+# ==========
+with seats_col:
+    st.subheader("Seats")
+
+    if not seats:
+        st.warning("No seats available in this interval (or no data available).")
+    else:
+        st.success(f"{len(seats)} seats fully available.")
+        df = pd.DataFrame(seats, columns=["seat_name", "seat_url", "seat_id", "power_available"])
+        st.dataframe(df[["seat_name", "power_available", "seat_url"]], width="stretch")
+
+# ==========
+# Book
+# ==========
+with book_col:
+    st.subheader("Book")
+
+    if not seats:
+        all_seats = load_all_seats_from_db()
+
+        if not all_seats:
+            st.info("No seats found in DB yet. Run seat discovery / init first.")
+            chosen_name = None
+            chosen_id = None
+            chosen_url = None
+        else:
+            chosen_name = st.selectbox(
+                "Choose a seat to try booking anyway",
+                options=list(all_seats.keys()),
+                index=None,
+                placeholder="Type to search…",
+                key="fallback_seat_name",
+            )
+            chosen_id, chosen_url = all_seats[chosen_name] if chosen_name else (None, None)
+
+        if st.button("Book seat (try anyway)",  type="primary", key="book_anyway"):
+            profile = st.session_state.profile
+            required = ["first_name", "last_name", "email", "phone", "student_number"]
+            missing = [k for k in required if not profile.get(k)]
+
+            if missing:
+                st.error(f"Please fill booking settings first: {', '.join(missing)}")
+            elif not chosen_id:
+                st.error("Please select a seat first.")
+            else:
+                st.info(f"Trying to book seat {chosen_name}…")
+                try:
+                    start_time_booking = to_libcal_label(start_time)
+                    msg = book_seat_now(
+                        chosen_id,
+                        rf"^{start_time_booking}(am|pm)?\b.*",
+                        y,
+                        profile,
+                    )
+                    st.success(msg)
+                    if chosen_url:
+                        st.markdown(chosen_url)
+                except Exception as e:
+                    st.error(f"Booking failed: {e}")
+
+    else:
+        options = {f"{name}": (seat_id, url) for (name, url, seat_id, power) in seats}
+
+        chosen_name = st.selectbox(
+            "Choose a seat to book",
+            list(options.keys()),
+            key="available_seat_name",
+        )
+        chosen_id, chosen_url = options[chosen_name]
+
+        if st.button(f"Book seat {chosen_name}",  type="primary", key="book_selected"):
+            profile = st.session_state.profile
+            required = ["first_name", "last_name", "email", "phone", "student_number"]
+            missing = [k for k in required if not profile.get(k)]
+
+            if missing:
+                st.error(f"Please fill booking settings first: {', '.join(missing)}")
+            else:
+                st.info(f"Trying to book seat {chosen_name}…")
+                try:
+                    start_time_booking = to_libcal_label(start_time)
+                    msg = book_seat_now(
+                        chosen_id,
+                        rf"^{start_time_booking}(am|pm)?\b.*",
+                        y,
+                        profile,
+                    )
+                    st.success(msg)
+                    st.markdown(chosen_url)
+                except Exception as e:
+                    st.error(f"Booking failed: {e}")
+
+# ==========
+# Automate
+# ==========
+with automate_col:
+    st.subheader("Automate")
+
+    if "show_checkin_form" not in st.session_state:
+        st.session_state.show_checkin_form = False
+    if "show_hunt_form" not in st.session_state:
+        st.session_state.show_hunt_form = False
+
+    b1, b2 = st.columns(2)
+    with b1:
+        if st.button("Automatic check-in", type="primary", key="btn_auto_checkin"):
+            st.session_state.show_checkin_form = True
+            st.session_state.show_hunt_form = False
+    with b2:
+        if st.button("Start Hunting", type="primary", key="btn_start_hunting"):
+            st.session_state.show_hunt_form = True
+            st.session_state.show_checkin_form = False
+
+    # --- Check-in form ---
+    if st.session_state.show_checkin_form:
+        with st.form("checkin_form"):
+            st.markdown("#### Schedule automatic check-in")
+
+            checkin_date = st.date_input("Date", value=d, key="checkin_date")
+            checkin_start = st.selectbox("Start time", OPTIONS, key="checkin_start")
+
+            checkin_code = st.text_input(
+                "Check-in code",
+                type="password",
+                placeholder="Enter check-in code",
+                key="checkin_code",
+            )
+
+            run_now = st.checkbox("Run now (temporary)", value=True, key="checkin_run_now")
+
+            confirm = st.form_submit_button("Confirm check-in", type = 'primary')
+
+        if confirm:
+            if not checkin_code.strip():
+                st.error("Please enter a check-in code.")
+            else:
+                st.session_state.checkin_request = {
+                    "date": str(checkin_date),
+                    "start_time": checkin_start,
+                    "code": checkin_code,
+                }
+                st.success(f"✅ Check-in saved for {checkin_date} at {checkin_start}.")
+
+                if run_now:
+                    with st.spinner("Running check-in now…"):
+                        try:
+                            msg = run_checkin_now(checkin_code)
+                            st.success(msg)
+                        except Exception as e:
+                            st.error(f"Check-in failed: {e}")
+
+            st.session_state.show_checkin_form = False
+
+
+    # --- Hunting form (RUN IMMEDIATELY on confirm) ---
+    if st.session_state.show_hunt_form:
+        with st.form("hunt_form"):
+            st.markdown("#### Run hunting now (no scheduling yet)")
+
+            power_selection = st.multiselect(
+                "Power available",
+                options=POWER_OPTIONS,
+                default=POWER_OPTIONS,
+                key="hunt_power",
+            )
+
+            areas = st.multiselect(
+                "Area",
+                options=AREA_OPTIONS,
+                default=[],
+                key="hunt_areas",
+            )
+
+            try_book = st.checkbox("Auto-book immediately if found", value=True, key="hunt_try_book")
+
+            confirm_hunt = st.form_submit_button("Confirm hunting",  type="primary")
+
+        if confirm_hunt:
+            # Build interval from your existing x/y strings (already computed earlier in app)
+            # x and y look like: "YYYY-MM-DD HH:MM:SS"
+            start_dt = datetime.fromisoformat(x)
+            end_dt = datetime.fromisoformat(y)
+
+            profile = st.session_state.profile
+            required = ["first_name", "last_name", "email", "phone", "student_number"]
+            missing = [k for k in required if not profile.get(k)]
+
+            if missing and try_book:
+                st.error(f"Fill booking settings first (needed for auto-book): {', '.join(missing)}")
+            else:
+                with st.spinner("Hunting now… checking snipable seats"):
+                    try:
+                        result = run_hunt_now(
+                            start_dt=start_dt,
+                            end_dt=end_dt,
+                            hunting_power=power_selection,
+                            hunting_areas=areas,
+                            profile=profile,
+                            try_book=try_book,
+                        )
+                        st.success(result["msg"])
+                        st.write(f"Candidates: {result['candidates']}, checked: {result['checked']}")
+                        if result["found"] is not None:
+                            st.write(f"Found seat_id: {result['found']}")
+                        if result.get("booked"):
+                            st.success(f"Booked: {result['booked']}")
+                    except Exception as e:
+                        st.error(f"Hunting failed: {e}")
+
+            st.session_state.show_hunt_form = False
+
+
+# ----------------------------
+# Bottom: Data (temporary buttons)
+# ----------------------------
+
+st.divider()
+st.markdown("### Data")
+
+if st.button("Update all availability", type="primary", key="update_all_availability_bottom"):
+    progress = st.progress(0)
+    status = st.empty()
+    started = time.time()
+
+    def cb(i, total, seat_id, failed):
+        pct = int((i / total) * 100) if total else 0
+        progress.progress(pct)
+        status.write(
+            f"Updating availability {i}/{total} "
+            f"(failed: {failed}) — last seat: {seat_id}"
+        )
+
+    with st.spinner("Fetching availability…"):
+        total, failed = update_availability_for_date(
+            d.isoformat(),
+            (d + timedelta(days=1)).isoformat(),
+            progress_cb=cb,
+        )
+
+    elapsed = time.time() - started
+    st.success(
+        f"Availability updated. "
+        f"Processed {total} seats, failed {failed}. "
+        f"Took {elapsed:.1f}s."
+    )
