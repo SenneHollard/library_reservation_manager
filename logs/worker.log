@@ -1,21 +1,107 @@
-2026-01-14 16:38:12.594 WARNING streamlit.runtime.caching.cache_data_api: No runtime found, using MemoryCacheStorageManager
-2026-01-14 16:38:12,605 INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2026-01-14 16:38:12,605 INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2026-01-14 16:38:12,605 INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2026-01-14 16:38:12,606 INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2026-01-14 16:38:12,606 INFO Scheduler started.
-2026-01-14 16:38:12,609 INFO Added job "nightly_job" to job store "default"
-2026-01-14 16:38:12,611 INFO Added job "update_today_job" to job store "default"
-2026-01-14 16:38:12,612 INFO Added job "dispatch_checkins_job" to job store "default"
-2026-01-14 16:38:12,613 INFO Added job "hunting_tick_job" to job store "default"
-2026-01-14 16:38:12,613 INFO Scheduler started
-2026-01-14 16:39:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:39:00 CET)" (scheduled at 2026-01-14 16:39:00+01:00)
-2026-01-14 16:39:00,012 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:40:00 CET)" executed successfully
-2026-01-14 16:40:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:41:00 CET)" (scheduled at 2026-01-14 16:40:00+01:00)
-2026-01-14 16:40:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:41:00 CET)" executed successfully
-2026-01-14 16:41:00,008 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:42:00 CET)" (scheduled at 2026-01-14 16:41:00+01:00)
-2026-01-14 16:41:00,009 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:42:00 CET)" executed successfully
-2026-01-14 16:42:00,010 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:43:00 CET)" (scheduled at 2026-01-14 16:42:00+01:00)
-2026-01-14 16:42:00,011 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:43:00 CET)" executed successfully
-2026-01-14 16:43:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:44:00 CET)" (scheduled at 2026-01-14 16:43:00+01:00)
-2026-01-14 16:43:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 16:44:00 CET)" executed successfully
+2026-01-14 17:49:29.729 WARNING streamlit.runtime.caching.cache_data_api: No runtime found, using MemoryCacheStorageManager
+2026-01-14 17:49:30,683 INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-01-14 17:49:30,684 INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-01-14 17:49:30,684 INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-01-14 17:49:30,684 INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-01-14 17:49:30,684 INFO Scheduler started.
+2026-01-14 17:49:30,690 INFO Added job "nightly_job" to job store "default"
+2026-01-14 17:49:30,692 INFO Added job "update_today_job" to job store "default"
+2026-01-14 17:49:30,693 INFO Added job "dispatch_checkins_job" to job store "default"
+2026-01-14 17:49:30,695 INFO Added job "hunting_tick_job" to job store "default"
+2026-01-14 17:49:30,695 INFO Scheduler started
+2026-01-14 17:50:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:50:00 CET)" (scheduled at 2026-01-14 17:50:00+01:00)
+2026-01-14 17:50:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:51:00 CET)" executed successfully
+2026-01-14 17:51:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:52:00 CET)" (scheduled at 2026-01-14 17:51:00+01:00)
+2026-01-14 17:51:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:52:00 CET)" executed successfully
+2026-01-14 17:52:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:53:00 CET)" (scheduled at 2026-01-14 17:52:00+01:00)
+2026-01-14 17:52:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:53:00 CET)" executed successfully
+2026-01-14 17:53:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:54:00 CET)" (scheduled at 2026-01-14 17:53:00+01:00)
+2026-01-14 17:53:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:54:00 CET)" executed successfully
+2026-01-14 17:54:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:55:00 CET)" (scheduled at 2026-01-14 17:54:00+01:00)
+2026-01-14 17:54:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:55:00 CET)" executed successfully
+2026-01-14 17:55:00,007 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:56:00 CET)" (scheduled at 2026-01-14 17:55:00+01:00)
+2026-01-14 17:55:00,009 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:56:00 CET)" executed successfully
+2026-01-14 17:56:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:57:00 CET)" (scheduled at 2026-01-14 17:56:00+01:00)
+2026-01-14 17:56:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:57:00 CET)" executed successfully
+2026-01-14 17:57:00,002 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:58:00 CET)" (scheduled at 2026-01-14 17:57:00+01:00)
+2026-01-14 17:57:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:58:00 CET)" executed successfully
+2026-01-14 17:58:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:59:00 CET)" (scheduled at 2026-01-14 17:58:00+01:00)
+2026-01-14 17:58:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 17:59:00 CET)" executed successfully
+2026-01-14 17:59:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:00:00 CET)" (scheduled at 2026-01-14 17:59:00+01:00)
+2026-01-14 17:59:00,009 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:00:00 CET)" executed successfully
+2026-01-14 18:00:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:01:00 CET)" (scheduled at 2026-01-14 18:00:00+01:00)
+2026-01-14 18:00:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:01:00 CET)" executed successfully
+2026-01-14 18:00:00,007 INFO Running job "hunting_tick_job (trigger: cron[hour='9-20', minute='0,30'], next run at: 2026-01-14 18:30:00 CET)" (scheduled at 2026-01-14 18:00:00+01:00)
+2026-01-14 18:00:00,008 INFO Job "hunting_tick_job (trigger: cron[hour='9-20', minute='0,30'], next run at: 2026-01-14 18:30:00 CET)" executed successfully
+2026-01-14 18:01:00,007 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:02:00 CET)" (scheduled at 2026-01-14 18:01:00+01:00)
+2026-01-14 18:01:00,009 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:02:00 CET)" executed successfully
+2026-01-14 18:02:00,002 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:03:00 CET)" (scheduled at 2026-01-14 18:02:00+01:00)
+2026-01-14 18:02:00,003 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:03:00 CET)" executed successfully
+2026-01-14 18:03:00,008 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:04:00 CET)" (scheduled at 2026-01-14 18:03:00+01:00)
+2026-01-14 18:03:00,010 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:04:00 CET)" executed successfully
+2026-01-14 18:04:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:05:00 CET)" (scheduled at 2026-01-14 18:04:00+01:00)
+2026-01-14 18:04:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:05:00 CET)" executed successfully
+2026-01-14 18:05:00,007 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:06:00 CET)" (scheduled at 2026-01-14 18:05:00+01:00)
+2026-01-14 18:05:02,895 INFO Ran 1 scheduled checkin(s)
+2026-01-14 18:05:02,895 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:06:00 CET)" executed successfully
+2026-01-14 18:06:00,001 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:07:00 CET)" (scheduled at 2026-01-14 18:06:00+01:00)
+2026-01-14 18:06:00,003 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:07:00 CET)" executed successfully
+2026-01-14 18:07:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:08:00 CET)" (scheduled at 2026-01-14 18:07:00+01:00)
+2026-01-14 18:07:00,006 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:08:00 CET)" executed successfully
+2026-01-14 18:08:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:09:00 CET)" (scheduled at 2026-01-14 18:08:00+01:00)
+2026-01-14 18:08:02,124 INFO Ran 1 scheduled checkin(s)
+2026-01-14 18:08:02,124 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:09:00 CET)" executed successfully
+2026-01-14 18:09:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:10:00 CET)" (scheduled at 2026-01-14 18:09:00+01:00)
+2026-01-14 18:09:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:10:00 CET)" executed successfully
+2026-01-14 18:10:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:11:00 CET)" (scheduled at 2026-01-14 18:10:00+01:00)
+2026-01-14 18:10:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:11:00 CET)" executed successfully
+2026-01-14 18:11:00,007 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:12:00 CET)" (scheduled at 2026-01-14 18:11:00+01:00)
+2026-01-14 18:11:00,010 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:12:00 CET)" executed successfully
+2026-01-14 18:12:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:13:00 CET)" (scheduled at 2026-01-14 18:12:00+01:00)
+2026-01-14 18:12:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:13:00 CET)" executed successfully
+2026-01-14 18:13:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:14:00 CET)" (scheduled at 2026-01-14 18:13:00+01:00)
+2026-01-14 18:13:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:14:00 CET)" executed successfully
+2026-01-14 18:14:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:15:00 CET)" (scheduled at 2026-01-14 18:14:00+01:00)
+2026-01-14 18:14:00,007 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:15:00 CET)" executed successfully
+2026-01-14 18:15:00,005 INFO Running job "update_today_job (trigger: cron[hour='8-20', minute='15,45'], next run at: 2026-01-14 18:45:00 CET)" (scheduled at 2026-01-14 18:15:00+01:00)
+2026-01-14 18:15:00,005 INFO Updating today availability: start=2026-01-14 end=2026-01-15
+2026-01-14 18:15:00,007 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:15:00 CET)" (scheduled at 2026-01-14 18:15:00+01:00)
+2026-01-14 18:15:00,011 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:16:00 CET)" executed successfully
+2026-01-14 18:16:00,001 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:17:00 CET)" (scheduled at 2026-01-14 18:16:00+01:00)
+2026-01-14 18:16:07,326 ERROR Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:17:00 CET)" raised an exception
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/libcal/lib/python3.11/site-packages/apscheduler/executors/base.py", line 131, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sennehollard/Documents/AI_premaster/Object_Oriented_Programming/library_reservation_manager/libcal_bot/worker/scheduler_worker.py", line 73, in dispatch_checkins_job
+    n = dispatch_due_checkins(
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sennehollard/Documents/AI_premaster/Object_Oriented_Programming/library_reservation_manager/libcal_bot/worker/tasks.py", line 105, in dispatch_due_checkins
+    _ensure_schema(conn)
+  File "/Users/sennehollard/Documents/AI_premaster/Object_Oriented_Programming/library_reservation_manager/libcal_bot/worker/tasks.py", line 44, in _ensure_schema
+    conn.executescript(SCHEMA)
+sqlite3.OperationalError: database is locked
+2026-01-14 18:17:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:18:00 CET)" (scheduled at 2026-01-14 18:17:00+01:00)
+2026-01-14 18:17:04,009 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:18:00 CET)" executed successfully
+2026-01-14 18:18:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:19:00 CET)" (scheduled at 2026-01-14 18:18:00+01:00)
+2026-01-14 18:18:02,352 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:19:00 CET)" executed successfully
+2026-01-14 18:19:00,006 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:20:00 CET)" (scheduled at 2026-01-14 18:19:00+01:00)
+2026-01-14 18:19:01,718 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:20:00 CET)" executed successfully
+2026-01-14 18:20:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:21:00 CET)" (scheduled at 2026-01-14 18:20:00+01:00)
+2026-01-14 18:20:00,877 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:21:00 CET)" executed successfully
+2026-01-14 18:21:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:22:00 CET)" (scheduled at 2026-01-14 18:21:00+01:00)
+2026-01-14 18:21:03,167 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:22:00 CET)" executed successfully
+2026-01-14 18:21:23,421 INFO Update today done: processed=1610 failed=0
+2026-01-14 18:21:23,421 INFO Job "update_today_job (trigger: cron[hour='8-20', minute='15,45'], next run at: 2026-01-14 18:45:00 CET)" executed successfully
+2026-01-14 18:22:00,008 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:23:00 CET)" (scheduled at 2026-01-14 18:22:00+01:00)
+2026-01-14 18:22:00,010 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:23:00 CET)" executed successfully
+2026-01-14 18:23:00,001 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:24:00 CET)" (scheduled at 2026-01-14 18:23:00+01:00)
+2026-01-14 18:23:00,002 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:24:00 CET)" executed successfully
+2026-01-14 18:24:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:25:00 CET)" (scheduled at 2026-01-14 18:24:00+01:00)
+2026-01-14 18:24:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:25:00 CET)" executed successfully
+2026-01-14 18:25:00,007 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:26:00 CET)" (scheduled at 2026-01-14 18:25:00+01:00)
+2026-01-14 18:25:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:26:00 CET)" executed successfully
+2026-01-14 18:26:00,004 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:27:00 CET)" (scheduled at 2026-01-14 18:26:00+01:00)
+2026-01-14 18:26:00,005 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:27:00 CET)" executed successfully
+2026-01-14 18:27:00,005 INFO Running job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:28:00 CET)" (scheduled at 2026-01-14 18:27:00+01:00)
+2026-01-14 18:27:00,008 INFO Job "dispatch_checkins_job (trigger: cron[second='0'], next run at: 2026-01-14 18:28:00 CET)" executed successfully

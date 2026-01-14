@@ -4,6 +4,7 @@ import time
 import sqlite3
 from pathlib import Path
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import streamlit as st
@@ -18,8 +19,12 @@ from libcal_bot.app.libcal_actions import (
     load_all_seats_from_db,
     run_checkin_now,
     run_hunt_now,
-    to_libcal_label
+    to_libcal_label,
+    next_hunting_tick,
+    worker_is_running
 )
+from libcal_bot.worker.tasks import list_checkins, cancel_checkin, start_hunting, get_hunting_status, stop_hunting, schedule_checkin
+
 
 # ----------------------------
 # Profile handling
@@ -345,41 +350,41 @@ with automate_col:
 
             checkin_code = st.text_input(
                 "Check-in code",
-                type="password",
                 placeholder="Enter check-in code",
                 key="checkin_code",
             )
 
-            run_now = st.checkbox("Run now (temporary)", value=True, key="checkin_run_now")
+            run_now = st.checkbox("Run now", value=False, key="checkin_run_now")
 
             confirm = st.form_submit_button("Confirm check-in", type = 'primary')
 
         if confirm:
             if not checkin_code.strip():
                 st.error("Please enter a check-in code.")
+            elif run_now:
+                with st.spinner("Running check-in now…"):
+                    try:
+                        msg = run_checkin_now(checkin_code)
+                        st.success(msg)
+                    except Exception as e:
+                        st.error(f"Check-in failed: {e}")
             else:
-                st.session_state.checkin_request = {
-                    "date": str(checkin_date),
-                    "start_time": checkin_start,
-                    "code": checkin_code,
-                }
-                st.success(f"✅ Check-in saved for {checkin_date} at {checkin_start}.")
+                task_id = schedule_checkin(
+                    checkin_date=str(checkin_date),
+                    checkin_start=checkin_start,
+                    code=checkin_code,
+                )
 
-                if run_now:
-                    with st.spinner("Running check-in now…"):
-                        try:
-                            msg = run_checkin_now(checkin_code)
-                            st.success(msg)
-                        except Exception as e:
-                            st.error(f"Check-in failed: {e}")
+                st.success(f"✅ Check-in scheduled (id={task_id}) for {checkin_date} at {checkin_start} (+5 min).")
 
             st.session_state.show_checkin_form = False
-
+    
+        st.divider()
 
     # --- Hunting form (RUN IMMEDIATELY on confirm) ---
     if st.session_state.show_hunt_form:
         with st.form("hunt_form"):
-            st.markdown("#### Run hunting now (no scheduling yet)")
+            st.markdown("#### Set hunting zone (no scheduling yet)")
 
             power_selection = st.multiselect(
                 "Power available",
@@ -395,75 +400,169 @@ with automate_col:
                 key="hunt_areas",
             )
 
-            try_book = st.checkbox("Auto-book immediately if found", value=True, key="hunt_try_book")
-
             confirm_hunt = st.form_submit_button("Confirm hunting",  type="primary")
 
-        if confirm_hunt:
-            # Build interval from your existing x/y strings (already computed earlier in app)
-            # x and y look like: "YYYY-MM-DD HH:MM:SS"
-            start_dt = datetime.fromisoformat(x)
-            end_dt = datetime.fromisoformat(y)
+            if confirm_hunt:
+                start_dt = datetime.fromisoformat(x)   # jouw x/y
+                end_dt = datetime.fromisoformat(y)
 
-            profile = st.session_state.profile
-            required = ["first_name", "last_name", "email", "phone", "student_number"]
-            missing = [k for k in required if not profile.get(k)]
+                profile = st.session_state.profile
+                required = ["first_name", "last_name", "email", "phone", "student_number"]
+                missing = [k for k in required if not profile.get(k)]
 
-            if missing and try_book:
-                st.error(f"Fill booking settings first (needed for auto-book): {', '.join(missing)}")
-            else:
-                with st.spinner("Hunting now… checking snipable seats"):
-                    try:
-                        result = run_hunt_now(
-                            start_dt=start_dt,
-                            end_dt=end_dt,
-                            hunting_power=power_selection,
-                            hunting_areas=areas,
-                            profile=profile,
-                            try_book=try_book,
+                if missing:
+                    st.error(f"Fill booking settings first (needed for auto-book): {', '.join(missing)}")
+                else:
+                    # 1) Preview (NO booking)
+                    with st.spinner("Previewing hunting… counting candidates"):
+                        try:
+                            preview = run_hunt_now(
+                                start_dt=start_dt,
+                                end_dt=end_dt,
+                                hunting_power=power_selection,
+                                hunting_areas=areas,
+                                profile=profile,
+                                try_book=False,   # <- preview only
+                            )
+                        except Exception as e:
+                            st.error(f"Preview failed: {e}")
+                            preview = None
+
+                    # 2) Start background hunting
+                    payload = dict(
+                        start_dt=start_dt,
+                        end_dt=end_dt,
+                        hunting_power=power_selection,
+                        hunting_areas=areas,
+                        profile=profile,
+                        try_book=try_book,
+                    )
+                    start_hunting(payload=payload)
+
+                    # 3) Message: candidates + next run time
+                    TZ = ZoneInfo("Europe/Amsterdam")
+                    nxt = next_hunting_tick(datetime.now(TZ), minutes=(0, 30))
+                    if preview is not None:
+                        st.success(
+                            f"✅ Hunting activated. Candidates now: {preview.get('candidates', '?')}. "
+                            f"Next attempt at {nxt.strftime('%H:%M')}."
                         )
-                        st.success(result["msg"])
-                        st.write(f"Candidates: {result['candidates']}, checked: {result['checked']}")
-                        if result["found"] is not None:
-                            st.write(f"Found seat_id: {result['found']}")
-                        if result.get("booked"):
-                            st.success(f"Booked: {result['booked']}")
-                    except Exception as e:
-                        st.error(f"Hunting failed: {e}")
+                    else:
+                        st.success(
+                            f"✅ Hunting activated. Next attempt at {nxt.strftime('%H:%M')}."
+                        )
 
-            st.session_state.show_hunt_form = False
+                st.session_state.show_hunt_form = False
+    
+    # -----------------------
+    # Scheduled check-ins list
+    # -----------------------
+    st.markdown("### Scheduled & Status")
+    checkins = list_checkins(limit=100)  # all statuses
+    if not checkins:
+        st.info("No scheduled check-ins yet.")
+    else:
+        st.markdown("#### Cancel a pending check-in")
+        pending = [c for c in checkins if c["status"] == "pending"]
+        if not pending:
+            st.caption("No pending check-ins to cancel.")
+        else:
+            # show buttons per pending checkin
+            for c in pending:
+                c1, c2, c3 = st.columns([2, 2, 1])
+                with c1:
+                    st.write(f"ID **{c['id']}**")
+                with c2:
+                    st.write(f"Runs at **{c['run_at_iso']}**")
+                with c3:
+                    if st.button("Cancel", key=f"cancel_checkin_{c['id']}"):
+                        ok = cancel_checkin(checkin_id=c["id"])
+                        if ok:
+                            st.success(f"Cancelled check-in {c['id']}.")
+                        else:
+                            st.warning("Could not cancel (maybe it already started).")
+                        st.rerun()
+
+    # -----------------------
+    # Hunting status + stop
+    # -----------------------
+    st.divider()
+    st.markdown("#### Hunting status")
+
+    hs = get_hunting_status()
+    if hs.get("active"):
+        st.success("🟢 Hunting is ACTIVE")
+        st.write(f"Started: {hs.get('created_at_iso')}")
+        st.write(f"Last run: {hs.get('last_run_at_iso')}")
+        if hs.get("error"):
+            st.error(f"Last error: {hs['error']}")
+        if hs.get("booked"):
+            st.success(f"Booked: {hs['booked']}")
+        if st.button("Stop hunting", type="primary", key="btn_stop_hunting"):
+            stop_hunting(reason="Stopped from UI")
+            st.success("Hunting stopped.")
+            st.rerun()
+    else:
+        st.info("🔴 Hunting is NOT active")
+        if hs.get("stopped_at_iso"):
+            st.caption(f"Stopped at: {hs.get('stopped_at_iso')}")
+        if hs.get("error"):
+            st.caption(f"Last error: {hs.get('error')}")
+        if hs.get("booked"):
+            st.caption(f"Last booked: {hs.get('booked')}")
 
 
 # ----------------------------
-# Bottom: Data (temporary buttons)
+# Bottom: Data (advanced / debug)
 # ----------------------------
 
 st.divider()
 st.markdown("### Data")
 
-if st.button("Update all availability", type="primary", key="update_all_availability_bottom"):
-    progress = st.progress(0)
-    status = st.empty()
-    started = time.time()
-
-    def cb(i, total, seat_id, failed):
-        pct = int((i / total) * 100) if total else 0
-        progress.progress(pct)
-        status.write(
-            f"Updating availability {i}/{total} "
-            f"(failed: {failed}) — last seat: {seat_id}"
-        )
-
-    with st.spinner("Fetching availability…"):
-        total, failed = update_availability_for_date(
-            d.isoformat(),
-            (d + timedelta(days=1)).isoformat(),
-            progress_cb=cb,
-        )
-
-    elapsed = time.time() - started
+if worker_is_running():
     st.success(
-        f"Availability updated. "
-        f"Processed {total} seats, failed {failed}. "
-        f"Took {elapsed:.1f}s."
+        "Background worker is running — availability is updated automatically. "
+        "Manual refresh is usually unnecessary."
     )
+else:
+    st.warning(
+        "⚠️ Background worker not detected. "
+        "Automatic updates may not be running."
+    )
+
+st.caption(
+    "Availability is normally updated automatically in the background. "
+    "Use this only if you want to force a manual refresh."
+)
+
+with st.expander("Advanced: force refresh availability", expanded=False):
+    if st.button(
+        "Force refresh availability (advanced)",
+        type="secondary",
+        key="force_refresh_availability",
+    ):
+        progress = st.progress(0)
+        status = st.empty()
+        started = time.time()
+
+        def cb(i, total, seat_id, failed):
+            pct = int((i / total) * 100) if total else 0
+            progress.progress(pct)
+            status.write(
+                f"Refreshing availability {i}/{total} "
+                f"(failed: {failed}) — last seat: {seat_id}"
+            )
+
+        with st.spinner("Forcing availability refresh…"):
+            total, failed = update_availability_for_date(
+                d.isoformat(),
+                (d + timedelta(days=1)).isoformat(),
+                progress_cb=cb,
+            )
+
+        elapsed = time.time() - started
+        st.success(
+            f"Refresh complete. "
+            f"Processed {total} seats, failed {failed}. "
+            f"Took {elapsed:.1f}s."
+        )

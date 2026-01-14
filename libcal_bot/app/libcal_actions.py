@@ -5,7 +5,9 @@ import streamlit as st
 import time
 import requests
 import sqlite3
+import subprocess
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from typing import List, Tuple, Optional, Sequence
 from libcal_bot.paths import DB_PATH
 from libcal_bot.fetch_availability.fetch_all_seats import init_static_data, fetch_availability, fetch_slots_with_retry, _make_libcal_session
@@ -207,3 +209,33 @@ def run_hunt_now(
         "booked": booked_msg,
         "msg": f"Found a snipable seat (seat_id={found_seat_id}).",
     }
+
+TZ = ZoneInfo("Europe/Amsterdam")
+
+def next_hunting_tick(now: datetime, minutes=(15, 45), tz: ZoneInfo = TZ) -> datetime:
+    """
+    Match dit aan je APScheduler cron (bijv. minute="15,45").
+    """
+    now = now.astimezone(tz).replace(second=0, microsecond=0)
+    for m in minutes:
+        candidate = now.replace(minute=m)
+        if candidate > now:
+            return candidate
+    # next hour
+    nxt = (now + timedelta(hours=1)).replace(minute=minutes[0])
+    return nxt
+
+def worker_is_running() -> bool:
+    """
+    Returns True if the scheduler worker process is running.
+    Works on macOS/Linux.
+    """
+    try:
+        result = subprocess.run(
+            ["pgrep", "-f", "libcal_bot.worker.scheduler_worker"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return result.returncode == 0
+    except Exception:
+        return False

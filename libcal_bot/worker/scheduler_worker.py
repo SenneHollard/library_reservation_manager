@@ -8,7 +8,8 @@ from datetime import datetime, timezone, timedelta
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
-from libcal_bot.app.libcal_actions import run_checkin_now, run_hunt_now
+from libcal_bot.app.libcal_actions import run_hunt_now
+from libcal_bot.book_seats.automatic_checkin import checkin_now
 from libcal_bot.worker.tasks import dispatch_due_checkins, active_hunting
 
 from libcal_bot.fetch_availability.fetch_all_seats import clean_up, fetch_availability
@@ -69,7 +70,9 @@ def update_today_job(db_path: str | None = None):
     )
 
 def dispatch_checkins_job():
-    n = dispatch_due_checkins(run_checkin_now=run_checkin_now)
+    n = dispatch_due_checkins(
+        run_checkin_now=lambda code: checkin_now(code, headless=True)
+    )
     if n:
         logging.info("Ran %s scheduled checkin(s)", n)
 
@@ -122,7 +125,7 @@ def main():
     scheduler.add_job(
         hunting_tick_job,
         trigger="cron",
-        hour="9-20",
+        hour="9-22",
         minute="0,30",
         id="hunting_tick",
         replace_existing=True,
