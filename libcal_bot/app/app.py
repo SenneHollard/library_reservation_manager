@@ -3,7 +3,7 @@ import json
 import time
 import sqlite3
 from pathlib import Path
-from datetime import date, timedelta, datetime
+from datetime import date, datetime, timedelta
 
 import pandas as pd
 import streamlit as st
@@ -15,7 +15,10 @@ from libcal_bot.app.libcal_actions import (
     get_available_seats,
     update_availability_for_date,
     book_seat_now,
-    load_all_seats_from_db
+    load_all_seats_from_db,
+    run_checkin_now,
+    run_hunt_now,
+    to_libcal_label
 )
 
 # ----------------------------
@@ -62,11 +65,19 @@ def half_hour_options(start="09:00", end="23:30"):
 
 OPTIONS = half_hour_options("09:00", "23:30") + ["00:00"]
 
+AREA_OPTIONS = [
+    "1.B",
+    "2.A", "2.B", "2.C",
+    "3.A", "3.B", "3.C",
+    "4.A", "4.B", "4.C",
+]
+
+POWER_OPTIONS = ["Power available", "No power"]  # you can select one or both
+
 
 # ----------------------------
 # Database readiness check
 # ----------------------------
-
 
 def db_ready() -> tuple[bool, str]:
     # maak DB + schema altijd aan
@@ -84,7 +95,6 @@ def db_ready() -> tuple[bool, str]:
         return False, f"Database error: {e}"
     finally:
         conn.close()
-
 
 
 # ----------------------------
@@ -182,138 +192,4 @@ end_options = OPTIONS[start_idx + 1:]
 
 # bepaal default index
 if "end_time" in st.session_state and st.session_state.end_time in end_options:
-    end_index = end_options.index(st.session_state.end_time)
-else:
-    end_index = (
-        end_options.index("22:00") if "22:00" in end_options else 0
-    )
-
-with colC:
-    end_time = st.selectbox(
-        "End",
-        end_options,
-        index=end_index,
-        key="end_time",
-    )
-    
-x = f"{d.isoformat()} {start_time}:00"
-end_date = d if end_time != "00:00" else (d + timedelta(days=1))
-y = f"{end_date.isoformat()} {end_time}:00"
-
-st.caption(f"Query interval: {x} → {y}")
-
-
-# ----------------------------
-# Actions
-# ----------------------------
-
-btn1, btn2, btn3 = st.columns(3)
-
-with btn1:
-    if st.button("Update all availability", type="primary"):
-        progress = st.progress(0)
-        status = st.empty()
-        started = time.time()
-
-        def cb(i, total, seat_id, failed):
-            pct = int((i / total) * 100) if total else 0
-            progress.progress(pct)
-            status.write(
-                f"Updating availability {i}/{total} "
-                f"(failed: {failed})"
-                f"last seat: {seat_id}"
-            )
-
-        with st.spinner("Fetching availability…"):
-            total, failed = update_availability_for_date(
-                d.isoformat(),
-                (d + timedelta(days=1)).isoformat(),
-                progress_cb=cb,
-            )
-
-        elapsed = time.time() - started
-        st.success(
-            f"Availability updated. "
-            f"Processed {total} seats, failed {failed}. "
-            f"Took {elapsed:.1f}s."
-        )
-
-with btn2:
-    if st.button("Show available seats"):
-        seats = get_available_seats(x, y)
-        st.success(f"{len(seats)} seats fully available.")
-        df = pd.DataFrame(seats, columns=["seat_name", "seat_url", "seat_id", "power_available"])
-        st.dataframe(df[["seat_name", "power_available", "seat_url"]], use_container_width=True)
-
-    if st.button("Show snipable seats"):
-        pass
-
-with btn3:
-    seats = get_available_seats(x, y)
-
-    if not seats:
-        st.warning("No seats available in this interval (or no data available).")
-
-        all_seats = load_all_seats_from_db()
-
-        if not all_seats:
-            st.info("No seats found in DB yet. Run seat discovery / init first.")
-        else:
-            chosen_name = st.selectbox(
-                "Choose a seat to try booking anyway",
-                options=list(all_seats.keys()),
-                index=None,                       # niets voorselecteren
-                placeholder="Type to search…",     # dropdown + typen om te zoeken
-                key="fallback_seat_name",
-            )
-            chosen_id, chosen_url = all_seats[chosen_name] if chosen_name else (None, None)
-
-        if st.button("Book seat (try anyway)", key="book_anyway"):
-            profile = st.session_state.profile
-            required = ["first_name", "last_name", "email", "phone", "student_number"]
-            missing = [k for k in required if not profile.get(k)]
-
-            if missing:
-                st.error(f"Please fill booking settings first: {', '.join(missing)}")
-            elif not chosen_id:
-                st.error("Please select a seat first.")
-            else:
-                st.info(f"Trying to book seat {chosen_name}…")
-                try:
-                    msg = book_seat_now(
-                        chosen_id,
-                        rf"^{start_time}(am|pm)?\b.*",
-                        y,
-                        profile,
-                    )
-                    st.success(msg)
-                    if chosen_url:
-                        st.markdown(chosen_url)
-                except Exception as e:
-                    st.error(f"Booking failed: {e}")
-    else:
-        options = {f"{name}": (seat_id, url) for (name, url, seat_id, power) in seats}
-
-        chosen_name = st.selectbox("Choose a seat to book", list(options.keys()))
-        chosen_id, chosen_url = options[chosen_name]
-
-        if st.button(f"Book seat {chosen_name}"):
-            profile = st.session_state.profile
-            required = ["first_name", "last_name", "email", "phone", "student_number"]
-            missing = [k for k in required if not profile.get(k)]
-
-            if missing:
-                st.error(f"Please fill booking settings first: {', '.join(missing)}")
-            else:
-                st.info(f"Trying to book seat {chosen_name}…")
-                try:
-                    msg = book_seat_now(
-                        chosen_id,
-                        rf"^{start_time}(am|pm)?\b.*",
-                        y,
-                        profile,
-                    )
-                    st.success(msg)
-                    st.markdown(chosen_url)
-                except Exception as e:
-                    st.error(f"Booking failed: {e}")
+    end_index =

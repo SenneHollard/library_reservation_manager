@@ -10,6 +10,23 @@ from libcal_bot.fetch_availability.discover_seats import fetch_all_seat_ids, fet
 from libcal_bot.fetch_availability.fetch_one_seat import GRID_URL, status_from_classname, upsert_seat
 
 
+def _make_libcal_session() -> requests.Session:
+    s = requests.Session()
+    s.headers.update({
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/122.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9,nl;q=0.8",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Origin": "https://libcal.rug.nl",
+        "Referer": "https://libcal.rug.nl/seats",
+        "X-Requested-With": "XMLHttpRequest",
+        "Connection": "keep-alive",
+    })
+    return s
+
+
 def fetch_slots_with_retry(session: requests.Session, seat_id: int, start_date: str, end_date: str,
                            lid=1443, gid=3634, eid=10948, zone=0, max_retries: int = 5) -> list[dict]:
     data = {
@@ -25,14 +42,28 @@ def fetch_slots_with_retry(session: requests.Session, seat_id: int, start_date: 
         "pageSize": "200",
     }
 
+    last_resp = None
     for attempt in range(max_retries):
         r = session.post(GRID_URL, data=data, timeout=30)
+        last_resp = r
+
+        if r.status_code == 403:
+            # Helpful debug (once)
+            raise requests.HTTPError(
+                f"403 Forbidden from grid. "
+                f"Check headers/cookies. Response snippet: {r.text[:200]!r}",
+                response=r,
+            )
+
         if r.status_code in (429, 500, 502, 503, 504):
             time.sleep(min(60, 1.5 ** attempt))
             continue
+
         r.raise_for_status()
         return r.json().get("slots", [])
-    r.raise_for_status()
+
+    if last_resp is not None:
+        last_resp.raise_for_status()
     return []
 
 
