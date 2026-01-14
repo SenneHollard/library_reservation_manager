@@ -1,5 +1,0 @@
-# SQLite databases
-*.sqlite
-*.sqlite3
-libcal_bot/data/*.sqlite
-user_profile.json
