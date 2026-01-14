@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# Databases
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+
+# Logs
+*.log
+logs/
+
+# Local config
+.env
+user_profile.json
