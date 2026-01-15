@@ -98,7 +98,6 @@ def to_libcal_label(start_time_24h: str) -> str:
 
 
 def book_seat_now(seat_id: int, start_label_regex: str, end_value: str, profile: dict) -> str:
-    from libcal_bot.book_seats.book_seat import book_seat_now as _book
     return _book(seat_id, start_label_regex, end_value, profile)
 
 def _slot_is_available(slots: list[dict], start_iso: str, end_iso: str) -> bool:
@@ -125,7 +124,7 @@ def run_checkin_now(code: str) -> str:
     """
     Immediate check-in (no scheduling yet).
     """
-    return checkin_now(code, headless=False)  # headed for debugging; later headless=True
+    return checkin_now(code, headless=True)
 
 
 def run_hunt_now(
