@@ -61,32 +61,4 @@ VENV_PATH=$HOME/venvs/libcal-ssh bash run_app.sh
 Detach (keep running in the background):
 Press Ctrl + B, then press D
 
-### F) Access the app from your own laptop (SSH tunnel)
-On your laptop:
-```bash
-ssh -N -L 8765:127.0.0.1:8765 <s-number>@ssh.lwp.rug.nl
-```
-Open in your browser:
-http://localhost:8765
-
-### G) Start the worker in tmux (optional)
-```bash
-tmux new -s workers
-cd ~/Desktop/¬/projects/library_reservation_manager
-source ~/venvs/libcal-ssh/bin/activate
-VENV_PATH=$HOME/venvs/libcal-ssh bash run_worker.sh
-```
-Detach:
-Press Ctrl + B, then press D
-
-### H) Useful tmux commands
-List running sessions:
-```bash
-tmux ls
-```
-
-Attach to a session:
-```bash
-tmux attach -t app
-tmux attach -t workers
-```
+### F) Access the app from your own

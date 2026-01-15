@@ -19,24 +19,3 @@ During installation:
 Verify installation:
 ```bash
 python --version
-```
-
-### 2. Clone the repository
-Open a terminal (Command Prompt / PowerShell / Terminal).
-Go to the folder where you want the project:
-```bash
-cd Desktop
-```
-
-Clone the repository:
-```bash
-git clone https://github.com/SenneHollard/library_reservation_manager.git
-```
-
-Enter the project folder:
-```bash
-cd library_reservation_manager
-```
-
-If you don’t have git installed yet:
-https://git-scm.com/downloads
